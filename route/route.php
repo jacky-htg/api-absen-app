@@ -1,5 +1,6 @@
 <?php
-    $function = "api_".substr($_SERVER['PATH_INFO'], 1);
+    $function = explode("/", $_SERVER["REQUEST_URI"]);
+    $function = $function[1].'_'.$function[2];
     if (!file_exists (APP."app/{$function}.php")) {
         http_response_code(404);
         die();
