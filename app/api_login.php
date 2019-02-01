@@ -1,29 +1,5 @@
 <?php
-    include "../config/config.php";
-    include "../libs/Generic.php";
-    include "../libs/BeforeValidException.php";
-    include "../libs/ExpiredException.php";
-    include "../libs/SignatureInvalidException.php";
-    include "../libs/JWT.php";
-    use \Firebase\JWT\JWT;
-
-    $header = getallheaders();
-
-    if (!empty($header["Authorization"])) {
-        $auth = $header["Authorization"];
-
-        if ($auth === $key) {
-            api_login();
-        } else {
-            echo "Invalid Bearer key.";
-        }
-    } else {
-        echo "Invalid Service Request. Bearer token required";
-    }
-
-    function api_login() {
-        // http://localhost/api/api_login.php // in local
-        // http://45.77.47.52/api/api_login.php //in server
+    function api_login() { 
         global $link;
 
         // get posted data
@@ -42,7 +18,7 @@
         $result = $link->query($sql);
         // result array values of query sql
         $row = $result->fetch_assoc();
-
+        
         // check user email & password login
         if ($row['email'] == $email && $row['password'] == $password) {
             // if exist in db, then return given jwt and display message success
@@ -74,7 +50,7 @@
                 'message' => 'Login Failed!'
             );
         }
-
+        
         // return display json message
         echo json_encode($response);
     

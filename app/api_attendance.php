@@ -1,29 +1,5 @@
 <?php
-    include "../config/config.php";
-    include "../libs/Generic.php";
-    include "../libs/BeforeValidException.php";
-    include "../libs/ExpiredException.php";
-    include "../libs/SignatureInvalidException.php";
-    include "../libs/JWT.php";
-    use \Firebase\JWT\JWT;
-
-    $header = getallheaders();
-
-    if (!empty($header["Authorization"])) {
-        $auth = $header["Authorization"];
-
-        if ($auth === $key) {
-            api_attendance();
-        } else {
-            echo "Invalid Bearer key.";
-        }
-    } else {
-        echo "Invalid Service Request. Bearer token required";
-    }
-
     function api_attendance() {
-        // http://localhost/api/api_attedance.php in local
-        // http://45.77.171.151/api/api_attedance.php in server
         global $link;
 
         // get posted data
