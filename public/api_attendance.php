@@ -1,7 +1,5 @@
 <?php
-    include "../config/db_config.php";    // files needed to connect to database
-    // generate json web token
-    include "../config/api_config.php";   // key bearer & jwt setting location
+    include "../config/config.php";
     include "../libs/Generic.php";
     include "../libs/BeforeValidException.php";
     include "../libs/ExpiredException.php";
