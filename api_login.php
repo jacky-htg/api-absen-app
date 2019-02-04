@@ -1,5 +1,31 @@
-<?php
-    function api_login() { 
+<?php 
+    define("APP", "/home/user/");
+    include APP."config/db_config.php";    // files needed to connect to database
+    // generate json web token
+    include APP."config/api_config.php";   // key bearer & jwt setting location
+    include APP."libs/BeforeValidException.php";
+    include APP."libs/ExpiredException.php";
+    include APP."libs/SignatureInvalidException.php";
+    include APP."libs/JWT.php";
+    use \Firebase\JWT\JWT;
+
+    $header = getallheaders();
+
+    if (!empty($header["Authorization"])) {
+        $auth = $header["Authorization"];
+
+        if ($auth === $key) {
+            api_login();
+        } else {
+            echo "Invalid Bearer key.";
+        }
+    } else {
+        echo "Invalid Service Request. Bearer token required";
+    }
+
+    function api_login() {
+        // http://localhost/api/api_login.php // in local
+        // http://45.77.47.52/api/api_login.php //in server
         global $link;
 
         // get posted data
@@ -18,12 +44,12 @@
         $result = $link->query($sql);
         // result array values of query sql
         $row = $result->fetch_assoc();
-        
+
         // check user email & password login
         if ($row['email'] == $email && $row['password'] == $password) {
             // if exist in db, then return given jwt and display message success
 
-            $key = "Bearer 65B6778032156";
+            $key = "Bearer token";
 
             $token = array(
                "iss" => $iss,
@@ -50,10 +76,12 @@
                 'message' => 'Login Failed!'
             );
         }
-        
+
         // return display json message
         echo json_encode($response);
     
     }
 
     $link->close();
+
+?>

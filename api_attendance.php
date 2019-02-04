@@ -1,12 +1,38 @@
 <?php
+    define("APP", "/home/api/");
+    include APP."config/db_config.php";    // files needed to connect to database
+    // generate json web token
+    include APP."config/api_config.php";   // key bearer & jwt setting location
+    include APP."libs/BeforeValidException.php";
+    include APP."libs/ExpiredException.php";
+    include APP."libs/SignatureInvalidException.php";
+    include APP."libs/JWT.php";
+    use \Firebase\JWT\JWT;
+
+    $header = getallheaders();
+
+    if (!empty($header["Authorization"])) {
+        $auth = $header["Authorization"];
+
+        if ($auth === $key) {
+            api_attendance();
+        } else {
+            echo "Invalid Bearer key.";
+        }
+    } else {
+        echo "Invalid Service Request. Bearer token required";
+    }
+
     function api_attendance() {
+        // http://localhost/api/api_attedance.php in local
+        // http://45.77.171.151/api/api_attedance.php in server
         global $link;
 
         // get posted data
         $json = file_get_contents('php://input');
         $data = json_decode($json);
 
-        $key = 'Bearer 65B6778032156'; //api key
+        $key = 'Bearer token'; //api key
         
         // set property values
         $jwt = isset($data->jwt) ? $data->jwt : '';
@@ -32,11 +58,16 @@
                 $result_num_row = $result->num_rows;
 
                 // check if num rows result of query sql equals 1
+		//$timezone = null;
                 if ($result_num_row == 1) {
                     // result array values of query sql
                     $row = $result->fetch_assoc();
                     // get nik value
                     $nik = $row['code'];
+		    //$timezone = $row['timezone'];
+    		    //if ($timezone) {
+			//date_default_timezone_set($timezone);
+		    //}
 
                     //echo $nik;
                 }
@@ -61,7 +92,11 @@
                 $distance = $row2['distance'];
                 // get radius
                 $radius = $row2['radius'];
+		$timezone = $row2['timezone'];
 
+		if ($timezone) {
+                	date_default_timezone_set($timezone);
+                }
                 
                 // check if distance closer than radius
                 if ($distance < $radius) {
@@ -70,7 +105,7 @@
                     // get location name is an name from table locations 
                     $location_name = $row2['name'];
                     // insert data to table attendance
-                    $sql3 = "INSERT INTO absens (absen_id, absen_date, location_id) VALUES('".$nik."',now(),'".$location_id."');";
+                    $sql3 = "INSERT INTO absens (absen_id, absen_date, location_id) VALUES('".$nik."','".date('Y-m-d H:i:s')."','".$location_id."');";
                     // result of query sql
                     $result3 = $link->query($sql3);
 
